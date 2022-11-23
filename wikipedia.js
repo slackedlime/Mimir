@@ -2,6 +2,7 @@
 // ?origin=*&action=opensearch&search= // Search
 // ?format=json&action=query&prop=pageimages&redirects=1&titles= // Get thumbnail
 // ?format=json&action=parse&prop=images&page= // Get all images
+// ?action=query&prop=imageinfo&iiprop=url&titles=File: // Get image url
 
 // https://simple.wikipedia.org/w/api.php
 // ?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles= // Summary
@@ -85,7 +86,37 @@ async function getImages(pageName) {
 }
 
 async function getImageDetails(imageName) {
+	imageName = "File:" + imageName;
 
+	let getImageURL = "https://en.wikipedia.org/w/api.php?" +
+		new URLSearchParams({
+			format: "json",
+			action: "query",
+			prop: "imageinfo",
+			iiprop: "url",
+			titles: imageName,
+		});
+	
+	let getDetailsURL = "https://commons.wikimedia.org/w/api.php?" +
+		new URLSearchParams({
+			format: "json",
+			action: "parse",
+			section: "1",
+			prop: "wikitext",
+			page: imageName,
+		});	
+	
+	let imageURLJson = await fetch(getImageURL).then(req => req.json());
+	let detailsJson = await fetch(getDetailsURL).then(req => req.json());
+
+	let imageURL = imageURLJson["query"]["pages"]["-1"]["imageinfo"][0]["url"];
+
+	let details = detailsJson["parse"]["wikitext"]["*"]
+					.match(/(?<={{en\|1=).*?(?=}})/)[0]
+					.replaceAll("[[", "")
+					.replaceAll("]]", "");
+
+	return [details, imageURL];
 }
 
 function getRecommendedPages(pageName) {
