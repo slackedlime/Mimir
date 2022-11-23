@@ -119,6 +119,41 @@ async function getImageDetails(imageName) {
 	return [details, imageURL];
 }
 
-function getRecommendedPages(pageName) {
+async function getRecommendedPages(pageName) {
+	let sectionsURL = "https://en.wikipedia.org/w/api.php?" +
+		new URLSearchParams({
+			format: "json",
+			action: "parse",
+			prop: "sections",
+			page: pageName,
+		});
+	
+	let sections = await fetch(sectionsURL).then(req => req.json());
+	
+	let sectionIndex;
 
+	for (let section of sections["parse"]["sections"]) {
+		if (section["line"] == "See also") {
+			sectionIndex = section["index"];
+		}
+	}
+
+	if (!sectionIndex) { return [] }
+
+	let seeAlsoURL = "https://en.wikipedia.org/w/api.php?" +
+		new URLSearchParams({
+			format: "json",
+			action: "parse",
+			prop: "links",
+			section: sectionIndex,
+			page: pageName,
+		});
+	
+	let seeAlsoJson = await fetch(seeAlsoURL).then(req => req.json());
+
+	let seeAlso = seeAlsoJson["parse"]["links"]
+					.filter(json => json["ns"] == 0)
+					.map(json => json["*"]);
+	
+	return seeAlso;
 }
