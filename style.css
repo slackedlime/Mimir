@@ -28,7 +28,6 @@ body {
 
 .search, .auto-complete {
 	background: var(--box-background);
-	width: 100%;
 	padding: 0.5em;
 	border-radius: 10px;
 }
@@ -37,7 +36,13 @@ body {
 	outline: none;
 	border: none;
 	
+	width: 100%;
 	margin-bottom: 5px;
+}
+
+.auto-complete {
+	position: absolute;
+	width: 97.5%;
 }
 
 .icon {

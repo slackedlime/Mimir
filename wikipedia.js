@@ -28,6 +28,7 @@ export async function getSummary(pageName) {
 	let summaryURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "query",
 			prop: "extracts",
 			exintro: "",
@@ -35,8 +36,6 @@ export async function getSummary(pageName) {
 			redirects: "1",
 			titles: pageName,
 		});
-
-	console.log(summaryURL)
 
 	let json = await fetch(summaryURL).then(req => req.json());
 
@@ -50,6 +49,7 @@ export async function getThumbnail(pageName) {
 	let thumbnailURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "query",
 			prop: "pageimages",
 			redirects: "1",
@@ -68,6 +68,7 @@ export async function getImages(pageName) {
 	let imagesURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "parse",
 			prop: "images",
 			page: pageName,
@@ -91,6 +92,7 @@ export async function getImageDetails(imageName) {
 	let getImageURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "query",
 			prop: "imageinfo",
 			iiprop: "url",
@@ -100,6 +102,7 @@ export async function getImageDetails(imageName) {
 	let getDetailsURL = "https://commons.wikimedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "parse",
 			section: "1",
 			prop: "wikitext",
@@ -123,6 +126,7 @@ export async function getRecommendedPages(pageName) {
 	let sectionsURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "parse",
 			prop: "sections",
 			page: pageName,
@@ -143,6 +147,7 @@ export async function getRecommendedPages(pageName) {
 	let seeAlsoURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
+			origin: "*",
 			action: "parse",
 			prop: "links",
 			section: sectionIndex,
