@@ -11,7 +11,7 @@ class Trivia {
 	}
 }
 
-async function getTrivia(numOfTrivia = 3) {
+export async function getTrivia(numOfTrivia = 3) {
 	let triviaURL = "https://the-trivia-api.com/api/questions?" +
 		new URLSearchParams({
 			categories: "science,general_knowledge,history",
@@ -23,7 +23,7 @@ async function getTrivia(numOfTrivia = 3) {
 	return json.map(question => new Trivia(question))
 }
 
-async function getRandomFact() {
+export async function getRandomFact() {
 	let factsURL = "https://www.thefact.space/random";
 
 	let json = await fetch(factsURL).then(req => req.json());

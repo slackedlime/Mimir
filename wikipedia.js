@@ -10,7 +10,7 @@
 // https://commons.wikimedia.org/w/api.php
 // ?format=json&action=parse&section=1&prop=wikitext&page=File: // Get image info
 
-async function getSearchItems(query) {
+export async function getSearchItems(query) {
 	let searchURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
@@ -24,7 +24,7 @@ async function getSearchItems(query) {
 	return json[1] // List of articles
 }
 
-async function getSummary(pageName) {
+export async function getSummary(pageName) {
 	let summaryURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
@@ -46,7 +46,7 @@ async function getSummary(pageName) {
 	return summary.split("\n")[0].replace(" (listen)", "")
 }
 
-async function getThumbnail(pageName) {
+export async function getThumbnail(pageName) {
 	let thumbnailURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",
@@ -62,7 +62,7 @@ async function getThumbnail(pageName) {
 	return pages[Object.keys(pages)[0]]["pageimage"];
 }
 
-async function getImages(pageName) {
+export async function getImages(pageName) {
 	let thumbnail = await getThumbnail(pageName)
 
 	let imagesURL = "https://en.wikipedia.org/w/api.php?" +
@@ -85,7 +85,7 @@ async function getImages(pageName) {
 	return imageNames;
 }
 
-async function getImageDetails(imageName) {
+export async function getImageDetails(imageName) {
 	imageName = "File:" + imageName;
 
 	let getImageURL = "https://en.wikipedia.org/w/api.php?" +
@@ -119,7 +119,7 @@ async function getImageDetails(imageName) {
 	return [details, imageURL];
 }
 
-async function getRecommendedPages(pageName) {
+export async function getRecommendedPages(pageName) {
 	let sectionsURL = "https://en.wikipedia.org/w/api.php?" +
 		new URLSearchParams({
 			format: "json",

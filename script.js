@@ -1,32 +1,37 @@
-class Trivia {
-	constructor(json) {
-		this.question = json["question"];
-		this.correctAnswer = json["correctAnswer"];
-		this.difficulty = json["difficulty"];
-		this.options = json["incorrectAnswers"];
+import * as wiki from "./wikipedia.js";
 
-		// Add the correct answer in a random index
-		let index = Math.floor(Math.random() * 4);
-		this.options.splice(index, 0, this.correctAnswer);
+const search = document.getElementById("search");
+const autoComplete = document.getElementById("auto-complete")
+
+search.addEventListener("input", () => {
+	if (!search.value) {
+		autoComplete.style.display = "none";
+		return;
+	} else {
+		autoComplete.style.display = "block";
 	}
-}
 
-async function getTrivia(numOfTrivia = 3) {
-	let triviaURL = "https://the-trivia-api.com/api/questions?" +
-		new URLSearchParams({
-			categories: "science,general_knowledge,history",
-			limit: numOfTrivia,
-		});
+	wiki.getSearchItems(search.value).then(items => {
+		autoComplete.textContent = "";
+		
+		if (!items.length) {
+			autoComplete.appendChild(document.createTextNode("No Results Found"))
+			return;
+		}
 
-	let json = await fetch(triviaURL).then(req => req.json());
+		for (let item of items) {
+			let list = document.createElement("li");
+			list.className = "search-items";
+			list.appendChild(document.createTextNode(item));
+			autoComplete.appendChild(list);
+		}
+	});
+});
 
-	return json.map(question => new Trivia(question))
-}
+search.addEventListener("focusin", () =>{
+	autoComplete.style.display = "block";
+});
 
-async function getRandomFact() {
-	let factsURL = "https://www.thefact.space/random";
-
-	let json = await fetch(factsURL).then(req => req.json());
-
-	return json["text"];
-}
+search.addEventListener("focusout", () =>{
+	autoComplete.style.display = "none";
+});
