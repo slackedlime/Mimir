@@ -1,24 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
-:root {
-	--text: #fafafa;
-	--special-text: #dddbd1;
-	--background: #141318;
-	--box-background: #232227;
-	--highlighted-background: #38373d;
-}
-
-* {
-	color: var(--text);
-	font-family: 'Poppins', sans-serif;
-	font-size: large;
-}
-
-body {
-	background-color: var(--background);
-	padding: 10px;
-}
-
 .search-wrapper {
 	position: relative;
 	margin: auto;
@@ -45,7 +24,7 @@ body {
 	width: 97.5%;
 }
 
-.icon {
+.search-icon {
 	color: var(--special-text);
 
 	position: absolute;
@@ -65,9 +44,4 @@ body {
 
 .search-items:hover {
 	background: var(--highlighted-background);
-}
-
-.line {
-	border: 0.1vh solid var(--special-text);
-	border-radius: 10px;
 }

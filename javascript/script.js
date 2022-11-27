@@ -43,7 +43,7 @@ function loadPage(event) {
 	autoComplete.style.display = "none";
 
 	wiki.getSummary(pageName).then(summary => {
-		summaryParagraph.innerText = summary;
+		summaryParagraph.innerHTML = summary.replaceAll("\n", "<br><br>");
 	})
 }
 

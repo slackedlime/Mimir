@@ -105,7 +105,7 @@ export async function getImages(pageName) {
 
 export async function getImageDetails(imageName) {
 	if (imageName == "default") {
-		return ["Mimir Default Image", "https://i.imgur.com/Bnrke6s.jpg"];
+		return ["Mimir Default Image", "images/default.jpg"];
 	}
 
 	imageName = "File:" + imageName;
