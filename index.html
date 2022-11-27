@@ -5,15 +5,18 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Mimir</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+	<link rel="stylesheet" 
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="css/search.css">
 	<script defer src="javascript/script.js" type="module"></script>
 </head>
 <body>
 	<header>
+		<h1 class="logo">ᛗᛁᛗᛁᚱ</h1>
+
 		<div class="search-wrapper">
-			<input type="text" placeholder="Type your Query here!" autocomplete="off" class="search" id="search">
+			<input type="text" placeholder="Type your Query here!"
+				autocomplete="off" class="search" id="search">
 
 			<div class="auto-complete" id="auto-complete" style="display: none">
 				Type To Search Something
@@ -23,21 +26,26 @@
 			
 		</div>
 
-		<hr class="line">
+		<hr>
 	</header>
 
 	<div class="wiki-wrapper">
-		<div class="summary" id="summary">
+		<div class="summary-wrapper wiki-box">
+			<h1 class="title" id="title"></h1>
 
+			<hr>
+
+			<p class="summary" id="summary"></p>
+
+			<div class="images" id="images"></div>
 		</div>
 
-		<div class="thumbnail" id="thumbnail">
-			
+		<div class="thumbnail-box wiki-box">
+			<img id="thumbnail" class="thumbnail">
+			<p id="thumbnail-explaination" class="thumbnail-explaination"></p>
 		</div>
 
-		<div class="images" id="images">
-			
-		</div>
+
 	</div>
 
 	<footer>

@@ -1,3 +1,38 @@
 .wiki-wrapper {
-	
+	display: grid;
+	grid-template-columns: 80% 20%;
+}
+
+.wiki-box {
+	background-color: var(--box-background);
+
+	border-radius: 15px;
+
+	margin: 25px;
+	padding: 20px;
+}
+
+.summary-wrapper {
+	margin-right: 0;
+}
+
+.title {
+	font-size: xx-large;
+
+	margin-top: 0.15em;
+}
+
+.summary {
+	font-size: larger;
+}
+
+.thumbnail {
+	max-width: 100%;
+}
+
+.thumbnail-explaination {
+	word-wrap: break-word;
+	text-align: center;
+
+	font-size: 1.15vw;
 }

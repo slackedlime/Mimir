@@ -45,11 +45,11 @@ export async function getSummary(pageName) {
 	summary = summary.split("\n")[0]; // Get only the first paragraph
 	summary = summary.replace(" (listen)", "").replace(" ()", "");
 	
-	let matches = summary.match(/\.[A-Z]/g);
+	let matches = summary.match(/\.[A-Z][a-z]/g);
 	
 	if (matches) {  // Add Line break if a "." follows a capital letter without space
 		for (let match of matches) {
-			summary = summary.replace(match, match[0] + "\n" + match[1])
+			summary = summary.replace(match, match[0] + "\n" + match.slice(1))
 		};
 	}
 	
@@ -105,7 +105,7 @@ export async function getImages(pageName) {
 
 export async function getImageDetails(imageName) {
 	if (imageName == "default") {
-		return ["Mimir Default Image", "images/default.jpg"];
+		return ["No Thumbnail For This Page", "images/default.jpg"];
 	}
 
 	imageName = "File:" + imageName;
@@ -129,17 +129,20 @@ export async function getImageDetails(imageName) {
 			prop: "wikitext",
 			page: imageName,
 		});	
-	
+
 	let imageURLJson = await fetch(getImageURL).then(req => req.json());
 	let detailsJson = await fetch(getDetailsURL).then(req => req.json());
+	
+	console.log(imageURLJson)
 
-	let imageURL = imageURLJson["query"]["pages"]["-1"]["imageinfo"][0]["url"];
+	let pages = imageURLJson["query"]["pages"]
+	let imageURL = pages[Object.keys(pages)[0]]["imageinfo"][0]["url"];
 
 	let details = detailsJson["parse"]["wikitext"]["*"]
-					.match(/(?<={{en\|1=).*?(?=}})/)[0]
-					.replaceAll("[[", "")
-					.replaceAll("]]", "");
+					.match(/(?<=(Description|{{en\|1)(| )=(| )).*?(?=(}}|\n))/);
 
+	details = details ? details[0].replaceAll("[[", "").replaceAll("]]", "") : "";
+		
 	return [details, imageURL];
 }
 

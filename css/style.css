@@ -1,10 +1,14 @@
+@import url("search.css");
+@import url("wiki.css");
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 :root {
 	--text: #fafafa;
-	--special-text: #dddbd1;
+	--special-text: #fff8E8;
 	--background: #141318;
 	--box-background: #232227;
+	--dark-box-background: #1b1a1c;
 	--highlighted-background: #38373d;
 }
 
@@ -19,7 +23,18 @@ body {
 	padding: 10px;
 }
 
-.line {
+hr {
 	border: 0.1vh solid var(--special-text);
 	border-radius: 10px;
+}
+
+.logo {
+	color: var(--special-text);
+
+	position: absolute;
+
+	margin-top: 0;
+
+	font-size: 50px;
+	font-weight: 100;
 }

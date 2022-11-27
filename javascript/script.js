@@ -1,9 +1,12 @@
 import * as wiki from "./wikipedia.js";
 
 const search = document.getElementById("search");
-const autoComplete = document.getElementById("auto-complete")
+const autoComplete = document.getElementById("auto-complete");
 
-const summaryParagraph = document.getElementById("summary")
+const summaryTitle = document.getElementById("title");
+const summaryParagraph = document.getElementById("summary");
+const thumbnail = document.getElementById("thumbnail");
+const thumbnailExplaination = document.getElementById("thumbnail-explaination");
 
 search.addEventListener("input", () => {
 	if (!search.value) {
@@ -17,7 +20,7 @@ search.addEventListener("input", () => {
 		autoComplete.textContent = "";
 		
 		if (!items.length) {
-			autoComplete.appendChild(document.createTextNode("No Results Found"))
+			autoComplete.appendChild(document.createTextNode("No Results Found"));
 			return;
 		}
 
@@ -42,9 +45,19 @@ function loadPage(event) {
 	let pageName = event.target.textContent;
 	autoComplete.style.display = "none";
 
+	thumbnailExplaination.textContent = "Fetching Image";
+	thumbnail.src = "";
+
+	summaryTitle.textContent = pageName;
+
 	wiki.getSummary(pageName).then(summary => {
 		summaryParagraph.innerHTML = summary.replaceAll("\n", "<br><br>");
-	})
+	});
+
+	wiki.getThumbnail(pageName).then(wiki.getImageDetails).then(details => {
+		thumbnailExplaination.textContent = details[0];
+		thumbnail.src = details[1];
+	});
 }
 
 search.addEventListener("focusin", () => {
@@ -52,6 +65,8 @@ search.addEventListener("focusin", () => {
 });
 
 search.addEventListener("focusout", async () =>{
-	await new Promise(r => setTimeout(r, 150));
+	await new Promise(r => setTimeout(r, 200));
 	autoComplete.style.display = "none";
 });
+
+loadPage({target: {textContent: "Mimir"}})
