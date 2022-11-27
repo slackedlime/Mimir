@@ -21,8 +21,30 @@ body {
 }
 
 hr {
-	border: 0.1vh solid var(--special-text);
-	border-radius: 10px;
+	background-color: var(--special-text);
+	border-radius: 15px;
+}
+
+footer {
+	background-color: var(--dark-box-background);
+
+	position: fixed;
+
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.footer-spacing {
+	padding-top: 350px;
+    margin-bottom: 20vh;
+}
+
+.footer-text {
+	color: var(--text);
+	font-size: small;
+	
+	margin-left: 0.75em;
 }
 
 .logo {

@@ -139,7 +139,7 @@ export async function getImageDetails(imageName) {
 	let imageURL = pages[Object.keys(pages)[0]]["imageinfo"][0]["url"];
 
 	let details = detailsJson["parse"]["wikitext"]["*"]
-					.match(/(?<=(Description|{{en\|1)(| )=(| )).*?(?=(}}|\n))/);
+					.match(/(?<=(Description|{{en\|(|1))(| )=(| )).*?(?=(}}|\n))/);
 
 	details = details ? details[0].replaceAll("[[", "").replaceAll("]]", "") : "";
 		
