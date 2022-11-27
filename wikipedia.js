@@ -40,9 +40,20 @@ export async function getSummary(pageName) {
 	let json = await fetch(summaryURL).then(req => req.json());
 
 	let pages = json["query"]["pages"];
-	let summary = pages[Object.keys(pages)[0]]["extract"]
+	let summary = pages[Object.keys(pages)[0]]["extract"];
 
-	return summary.split("\n")[0].replace(" (listen)", "")
+	summary = summary.split("\n")[0]; // Get only the first paragraph
+	summary = summary.replace(" (listen)", "").replace(" ()", "");
+	
+	let matches = summary.match(/\.[A-Z]/g);
+	
+	if (matches) {  // Add Line break if a "." follows a capital letter without space
+		for (let match of matches) {
+			summary = summary.replace(match, match[0] + "\n" + match[1])
+		};
+	}
+	
+	return summary;
 }
 
 export async function getThumbnail(pageName) {
@@ -59,7 +70,13 @@ export async function getThumbnail(pageName) {
 	let json = await fetch(thumbnailURL).then(req => req.json());
 
 	let pages = json["query"]["pages"];
-	return pages[Object.keys(pages)[0]]["pageimage"];
+	let thumbnail = pages[Object.keys(pages)[0]]["pageimage"];
+
+	if (thumbnail) {
+		return thumbnail;
+	}
+
+	return "default";
 }
 
 export async function getImages(pageName) {
@@ -87,6 +104,10 @@ export async function getImages(pageName) {
 }
 
 export async function getImageDetails(imageName) {
+	if (imageName == "default") {
+		return ["Mimir Default Image", "https://i.imgur.com/Bnrke6s.jpg"];
+	}
+
 	imageName = "File:" + imageName;
 
 	let getImageURL = "https://en.wikipedia.org/w/api.php?" +
