@@ -54,9 +54,9 @@ function loadPage(event) {
 		summaryParagraph.innerHTML = summary.replaceAll("\n", "<br><br>");
 	});
 
-	wiki.getThumbnail(pageName).then(wiki.getImageDetails).then(details => {
-		thumbnailExplaination.textContent = details[0];
-		thumbnail.src = details[1];
+	wiki.getThumbnail(pageName).then(details => {
+		thumbnail.src = details[0];
+		thumbnailExplaination.innerHTML = details[1];
 	});
 }
 

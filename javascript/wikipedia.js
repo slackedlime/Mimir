@@ -61,22 +61,40 @@ export async function getThumbnail(pageName) {
 		new URLSearchParams({
 			format: "json",
 			origin: "*",
-			action: "query",
-			prop: "pageimages",
+			action: "parse",
+			section: "0",
 			redirects: "1",
-			titles: pageName,
+			page: pageName,
 		});
 	
 	let json = await fetch(thumbnailURL).then(req => req.json());
+	
+	let thumbnail = "images/default.jpg";
+	let caption = "";
 
-	let pages = json["query"]["pages"];
-	let thumbnail = pages[Object.keys(pages)[0]]["pageimage"];
+	let contents = json["parse"]["text"]["*"];
 
-	if (thumbnail) {
-		return thumbnail;
+	let thumbnails = contents.match(/(?<=(infobox|thumbinner).*src=").*?(?=")/s);
+
+	if (thumbnails) {
+		thumbnail = "https:" + thumbnails[0];
 	}
 
-	return "default";
+	let captions = contents.match(
+		/(?<=(infobox-caption"(|.*)>|(thumbcaption).*div>)).*?(?=<\/div)/s
+	);
+
+	if (captions) {
+		caption = captions[0];
+
+		let matches = caption.match(/<.*?>/g);
+
+		if (matches) { // Remove HTML tags if any
+			matches.map(match => caption = caption.replace(match, ""));
+		}
+	}
+
+	return [thumbnail, caption];
 }
 
 export async function getImages(pageName) {
