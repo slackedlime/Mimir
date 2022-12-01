@@ -44,14 +44,10 @@ export async function getSummary(pageName) {
 
 	summary = summary.split("\n")[0]; // Get only the first paragraph
 	summary = summary.replace(" (listen)", "").replace(" ()", "");
+	summary = summary.replace("(; ", "(").replace(/\)(?=.)/, ") ");	
 	
-	let matches = summary.match(/\.[A-Z][a-z]/g);
-	
-	if (matches) {  // Add Line break if a "." follows a capital letter without space
-		for (let match of matches) {
-			summary = summary.replace(match, match[0] + "\n" + match.slice(1))
-		};
-	}
+	// Add Line break if a "." follows a capital letter without space
+	summary = summary.replaceAll(/\.(?=[A-Z][a-z ])/g, ".\n");
 	
 	return summary;
 }
@@ -69,8 +65,10 @@ export async function getThumbnail(pageName) {
 	
 	let json = await fetch(thumbnailURL).then(req => req.json());
 	
+	console.log(json)
+
 	let thumbnail = "images/default.jpg";
-	let caption = json["parse"]["title"];
+	let caption = "";
 
 	let contents = json["parse"]["text"]["*"];
 	
@@ -81,18 +79,16 @@ export async function getThumbnail(pageName) {
 		thumbnails = contents.match(/(?<=(infobox|thumbinner).*src=").*?(?=")/s);
 	}
 
-	if (thumbnails) {
+	if (thumbnails && thumbnails[0].slice(0, 4) != "http") {
 		thumbnail = "https:" + thumbnails[0];
-
-	} else {
-		caption = ""; // No caption if the default image is present
+		caption = json["parse"]["title"];
 	}
 
 	let captions = contents.match(
 		/(?<=(infobox-caption"(|.*)>|(thumbcaption).*div>)).*?(?=<\/div>)/s
 	);
 
-	if (captions) {
+	if (captions && captions["index"] - thumbnails["index"] < 1000) {
 		caption = captions[0];
 
 		let matches = caption.match(/<.*?>|&#91;.&#93;/g);
