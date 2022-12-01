@@ -35,10 +35,12 @@ search.addEventListener("input", () => {
 });
 
 document.onkeydown = function(event) {
-    event = event || window.event;
-    if (event.code == "Escape") {
-        autoComplete.style.display = "none";
-    }
+	event = event || window.event;
+	if (event.code == "Escape") {
+		autoComplete.style.display = "none";
+	} else if (event.code == "Enter" && document.activeElement === search) {
+		loadPage({target: autoComplete.firstChild});
+	}
 };
 
 function loadPage(event) {
@@ -46,7 +48,7 @@ function loadPage(event) {
 	autoComplete.style.display = "none";
 
 	thumbnailExplaination.textContent = "Fetching Image";
-	thumbnail.src = "";
+	thumbnail.src = "images/loading.gif";
 
 	summaryTitle.textContent = pageName;
 
@@ -64,9 +66,13 @@ search.addEventListener("focusin", () => {
 	autoComplete.style.display = "block";
 });
 
-search.addEventListener("focusout", async () =>{
+search.addEventListener("focusout", async () => {
 	await new Promise(r => setTimeout(r, 200));
 	autoComplete.style.display = "none";
 });
 
-loadPage({target: {textContent: "Mimir"}})
+let params = new URLSearchParams(window.location.search);
+
+let page = params.has("page") ? params.get("page") : "Mimir";
+
+loadPage({target: {textContent: page}});

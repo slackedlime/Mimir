@@ -70,24 +70,32 @@ export async function getThumbnail(pageName) {
 	let json = await fetch(thumbnailURL).then(req => req.json());
 	
 	let thumbnail = "images/default.jpg";
-	let caption = "";
+	let caption = json["parse"]["title"];
 
 	let contents = json["parse"]["text"]["*"];
-
-	let thumbnails = contents.match(/(?<=(infobox|thumbinner).*src=").*?(?=")/s);
+	
+	let thumbnails = contents.match(/(?<=(infobox|thumbinner).*srcset=").*?(?= )/s);
+	
+	if (!thumbnails) {
+		// Lower resolution
+		thumbnails = contents.match(/(?<=(infobox|thumbinner).*src=").*?(?=")/s);
+	}
 
 	if (thumbnails) {
 		thumbnail = "https:" + thumbnails[0];
+
+	} else {
+		caption = ""; // No caption if the default image is present
 	}
 
 	let captions = contents.match(
-		/(?<=(infobox-caption"(|.*)>|(thumbcaption).*div>)).*?(?=<\/div)/s
+		/(?<=(infobox-caption"(|.*)>|(thumbcaption).*div>)).*?(?=<\/div>)/s
 	);
 
 	if (captions) {
 		caption = captions[0];
 
-		let matches = caption.match(/<.*?>/g);
+		let matches = caption.match(/<.*?>|&#91;.&#93;/g);
 
 		if (matches) { // Remove HTML tags if any
 			matches.map(match => caption = caption.replace(match, ""));
@@ -150,8 +158,6 @@ export async function getImageDetails(imageName) {
 
 	let imageURLJson = await fetch(getImageURL).then(req => req.json());
 	let detailsJson = await fetch(getDetailsURL).then(req => req.json());
-	
-	console.log(imageURLJson)
 
 	let pages = imageURLJson["query"]["pages"]
 	let imageURL = pages[Object.keys(pages)[0]]["imageinfo"][0]["url"];
