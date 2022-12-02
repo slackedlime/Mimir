@@ -18,9 +18,10 @@ function loadPage(event) {
 	thumbnail.src = "images/loading.gif";
 
 	summaryTitle.textContent = pageName;
+	summaryParagraph.textContent = "";
 
 	wiki.getSummary(pageName).then(summary => {
-		summaryParagraph.innerHTML = summary.replaceAll("\n", "<br><br>");
+		summaryParagraph.innerHTML = summary.replaceAll("\n\n", "<br><br>");
 	});
 
 	wiki.getThumbnail(pageName).then(details => {
@@ -58,7 +59,7 @@ search.addEventListener("input", () => {
 
 			list.className = "search-items";
 			list.role = "button";
-			list.tabIndex = "0"
+			list.tabIndex = "0";
 
 			list.addEventListener("click", loadPage);
 			list.addEventListener("focusout", closeSearch);

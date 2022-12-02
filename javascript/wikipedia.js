@@ -24,8 +24,8 @@ export async function getSearchItems(query) {
 	return json[1] // List of articles
 }
 
-export async function getSummary(pageName) {
-	let summaryURL = "https://en.wikipedia.org/w/api.php?" +
+async function getSummaryFromType(pageName, type = "en") {
+	let summaryURL = `https://${type}.wikipedia.org/w/api.php?` +
 		new URLSearchParams({
 			format: "json",
 			origin: "*",
@@ -42,18 +42,36 @@ export async function getSummary(pageName) {
 	let pages = json["query"]["pages"];
 	let summary = pages[Object.keys(pages)[0]]["extract"];
 
-	summary = summary.split("\n")[0]; // Get only the first paragraph
-	summary = summary.replace(" (listen)", "").replace(" ()", "");
-	summary = summary.replace("(; ", "(").replace(/\)(?=.)/, ") ");	
-	
-	// Add Line break if a "." follows a capital letter without space
-	summary = summary.replaceAll(/\.(?=[A-Z][a-z ])/g, ".\n");
-	
 	return summary;
 }
 
-export async function getThumbnail(pageName) {
-	let thumbnailURL = "https://en.wikipedia.org/w/api.php?" +
+export async function getSummary(pageName) {
+	let summaries = await Promise.all([
+		getSummaryFromType(pageName, "simple"),
+		getSummaryFromType(pageName, "en"),
+	]);
+
+	let [simpleSummary, normalSummary] = summaries;
+
+	let summary = simpleSummary ? simpleSummary : normalSummary;
+	let summaryType = simpleSummary ? "simple" : "normal";
+
+	if (summaryType == "normal") {
+		summary = summary.split("\n")[0]; // Get only the first paragraph
+	}
+
+	summary = summary.replace(" (listen)", "").replace(" ()", "");
+	summary = summary.replace("(pronunciation )", "");
+	summary = summary.replace("(; ", "(").replace(/\)(?=.)/, ") ");	
+	
+	// Add Line break if a "." follows a capital letter without space
+	summary = summary.replaceAll(/\.(?=[A-Z][a-z ])/g, ".\n\n");
+
+	return summary;
+}
+
+export async function getThumbnail(pageName, type = "en") {
+	let thumbnailURL = `https://${type}.wikipedia.org/w/api.php?` +
 		new URLSearchParams({
 			format: "json",
 			origin: "*",
@@ -64,24 +82,36 @@ export async function getThumbnail(pageName) {
 		});
 	
 	let json = await fetch(thumbnailURL).then(req => req.json());
-	
-	console.log(json)
+
+	if (!json["parse"]) {
+		return null;
+	}
 
 	let thumbnail = "images/default.jpg";
-	let caption = "";
+	let caption = json["parse"]["title"];
 
 	let contents = json["parse"]["text"]["*"];
 	
 	let thumbnails = contents.match(/(?<=(infobox|thumbinner).*srcset=").*?(?= )/s);
+	let thumbnailLowRes = contents.match(/(?<=(infobox|thumbinner).*src=").*?(?=")/s);
 	
-	if (!thumbnails) {
+	if (!thumbnails || thumbnailLowRes["index"] - thumbnails["index"] < 1000) {
 		// Lower resolution
-		thumbnails = contents.match(/(?<=(infobox|thumbinner).*src=").*?(?=")/s);
+		thumbnails = thumbnailLowRes;
 	}
 
 	if (thumbnails && thumbnails[0].slice(0, 4) != "http") {
 		thumbnail = "https:" + thumbnails[0];
-		caption = json["parse"]["title"];
+	} else {
+		caption = "";
+
+		if (type == "en") {
+			let simpleThumbnail = await getThumbnail(pageName, "simple");
+
+			if (simpleThumbnail) {
+				return simpleThumbnail;
+			}
+		}
 	}
 
 	let captions = contents.match(
@@ -123,47 +153,6 @@ export async function getImages(pageName) {
 	imageNames.unshift(thumbnail); // Make the thumbnail the first element
 	
 	return imageNames;
-}
-
-export async function getImageDetails(imageName) {
-	if (imageName == "default") {
-		return ["No Thumbnail For This Page", "images/default.jpg"];
-	}
-
-	imageName = "File:" + imageName;
-
-	let getImageURL = "https://en.wikipedia.org/w/api.php?" +
-		new URLSearchParams({
-			format: "json",
-			origin: "*",
-			action: "query",
-			prop: "imageinfo",
-			iiprop: "url",
-			titles: imageName,
-		});
-	
-	let getDetailsURL = "https://commons.wikimedia.org/w/api.php?" +
-		new URLSearchParams({
-			format: "json",
-			origin: "*",
-			action: "parse",
-			section: "1",
-			prop: "wikitext",
-			page: imageName,
-		});	
-
-	let imageURLJson = await fetch(getImageURL).then(req => req.json());
-	let detailsJson = await fetch(getDetailsURL).then(req => req.json());
-
-	let pages = imageURLJson["query"]["pages"]
-	let imageURL = pages[Object.keys(pages)[0]]["imageinfo"][0]["url"];
-
-	let details = detailsJson["parse"]["wikitext"]["*"]
-					.match(/(?<=(Description|{{en\|(|1))(| )=(| )).*?(?=(}}|\n))/);
-
-	details = details ? details[0].replaceAll("[[", "").replaceAll("]]", "") : "";
-		
-	return [details, imageURL];
 }
 
 export async function getRecommendedPages(pageName) {
