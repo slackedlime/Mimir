@@ -21,7 +21,10 @@ export async function getSearchItems(query) {
 
 	let json = await fetch(searchURL).then(req => req.json());
 
-	return json[1] // List of articles
+	 // Remove any lists
+	let searchItems = json[1].filter(item => !item.includes("List of"));
+
+	return searchItems; // A List of all articles
 }
 
 async function getSummaryFromType(pageName, type = "en") {
@@ -45,6 +48,30 @@ async function getSummaryFromType(pageName, type = "en") {
 	return summary;
 }
 
+async function getReferPages(pageName) {
+	let referURL = `https://en.wikipedia.org/w/api.php?` +
+		new URLSearchParams({
+			format: "json",
+			origin: "*",
+			action: "parse",
+			redirects: "1",
+			page: pageName,
+		});
+	
+	let json = await fetch(referURL).then(req => req.json());
+	
+	let referPages = `<h2>${pageName} can refer to:</h2>`;
+	
+	for (let link of json["parse"]["links"]) {
+		if (link["ns"] != 0) { continue; } // continue if link is not an article
+
+		let linkName = link["*"];
+		referPages += `<li><a href=".?page=${linkName}">${linkName}</a></li>`;
+	}
+
+	return referPages;
+}
+
 export async function getSummary(pageName) {
 	let summaries = await Promise.all([
 		getSummaryFromType(pageName, "simple"),
@@ -52,6 +79,10 @@ export async function getSummary(pageName) {
 	]);
 
 	let [simpleSummary, normalSummary] = summaries;
+
+	if (normalSummary.split("\n")[0].substr(-9) == "refer to:") {
+		return getReferPages(pageName);
+	}
 
 	let summary = simpleSummary ? simpleSummary : normalSummary;
 	let summaryType = simpleSummary ? "simple" : "normal";
@@ -62,10 +93,14 @@ export async function getSummary(pageName) {
 
 	summary = summary.replace(" (listen)", "").replace(" ()", "");
 	summary = summary.replace("(pronunciation )", "");
-	summary = summary.replace("(; ", "(").replace(/\)(?=.)/, ") ");	
+	summary = summary.replace("(; ", "(").replace(/\)(?=.)/, ") ");
 	
+	if (summary[summary.length - 1] == ":") {
+		summary = summary.replace(/ [\w\s:]+$/, "");
+	}
+
 	// Add Line break if a "." follows a capital letter without space
-	summary = summary.replaceAll(/\.(?=[A-Z][a-z ])/g, ".\n\n");
+	summary = summary.replaceAll(/\.(?=[A-Z][a-z ])/g, ".<br><br>");
 
 	return summary;
 }

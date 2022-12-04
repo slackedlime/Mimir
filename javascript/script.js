@@ -1,7 +1,5 @@
 import * as wiki from "./wikipedia.js";
 
-const websiteName = document.location.origin;
-
 const search = document.getElementById("search");
 const autoComplete = document.getElementById("auto-complete");
 
@@ -21,12 +19,11 @@ function loadPage(event) {
 	summaryParagraph.textContent = "";
 
 	wiki.getSummary(pageName).then(summary => {
-		summaryParagraph.innerHTML = summary.replaceAll("\n\n", "<br><br>");
+		summaryParagraph.innerHTML = summary;
 	});
 
 	wiki.getThumbnail(pageName).then(details => {
-		thumbnail.src = details[0];
-		thumbnailExplaination.innerHTML = details[1];
+		[thumbnail.src, thumbnailExplaination.innerHTML] = details;
 	});
 }
 
@@ -50,7 +47,9 @@ search.addEventListener("input", () => {
 		autoComplete.textContent = "";
 		
 		if (!items.length) {
-			autoComplete.appendChild(document.createTextNode("No Results Found"));
+			autoComplete.appendChild(document.createTextNode(
+				"Your Question Seems Specific, Why don't you try asking it in TELL?"
+			));
 			return;
 		}
 

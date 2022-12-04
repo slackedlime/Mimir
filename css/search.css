@@ -21,7 +21,9 @@
 
 .auto-complete {
 	position: absolute;
-	width: 97.5%;
+	width: 97%;
+
+	border: 3px solid var(--dark-box-background);
 }
 
 .search-icon {
