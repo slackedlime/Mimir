@@ -48,8 +48,9 @@ search.addEventListener("input", () => {
 		
 		if (!items.length) {
 			autoComplete.appendChild(document.createTextNode(
-				"Your Question Seems Specific, Why don't you try asking it in TELL?"
+				"Your Question Seems Specific, Why don't you try Asking it?"
 			));
+			
 			return;
 		}
 

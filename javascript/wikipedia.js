@@ -44,12 +44,23 @@ async function getSummaryFromType(pageName, type = "en") {
 
 	let pages = json["query"]["pages"];
 	let summary = pages[Object.keys(pages)[0]]["extract"];
+	
+	let title = pages[Object.keys(pages)[0]]["title"];
+
+	// Check if page is a list
+	if (title.substr(0, 4) == "List" && type == "en") {
+		let link = document.createElement("a");
+		link.href = `https://en.wikipedia.com/wiki/${pageName}`;
+		link.textContent = "Get The List on Wikipedia";
+	
+		summary += "<br><br>" + link.outerHTML;
+	}
 
 	return summary;
 }
 
-async function getReferPages(pageName) {
-	let referURL = `https://en.wikipedia.org/w/api.php?` +
+async function getReferPages(pageName, type = "en") {
+	let referURL = `https://${type}.wikipedia.org/w/api.php?` +
 		new URLSearchParams({
 			format: "json",
 			origin: "*",
@@ -66,7 +77,15 @@ async function getReferPages(pageName) {
 		if (link["ns"] != 0) { continue; } // continue if link is not an article
 
 		let linkName = link["*"];
-		referPages += `<li><a href=".?page=${linkName}">${linkName}</a></li>`;
+
+		let listLink = document.createElement("a");
+		listLink.href = `.?page=${linkName}`;
+		listLink.textContent = linkName;
+
+		let listItem = document.createElement("li");
+		listItem.appendChild(listLink);
+
+		referPages += listItem.outerHTML;
 	}
 
 	return referPages;
@@ -87,17 +106,28 @@ export async function getSummary(pageName) {
 	let summary = simpleSummary ? simpleSummary : normalSummary;
 	let summaryType = simpleSummary ? "simple" : "normal";
 
+	if (
+		summaryType == "simple" && 
+		simpleSummary.split("\n")[0].substr(-11) == "might mean:"
+	) {
+
+		return getReferPages(pageName, "simple");
+	}
+
 	if (summaryType == "normal") {
-		summary = summary.split("\n")[0]; // Get only the first paragraph
+		let firstParagraph = summary.split("\n")[0];
+
+		if (firstParagraph[firstParagraph.length - 1] != ":") {
+			summary = firstParagraph;
+		} else {
+			summary = summary.replaceAll(":\n", ":");
+			summary = summary.replaceAll(/(\n|(?<=[a-z])(?=[A-Z]))/g, "<br><br>")
+		}
 	}
 
 	summary = summary.replace(" (listen)", "").replace(" ()", "");
 	summary = summary.replace("(pronunciation )", "");
 	summary = summary.replace("(; ", "(").replace(/\)(?=.)/, ") ");
-	
-	if (summary[summary.length - 1] == ":") {
-		summary = summary.replace(/ [\w\s:]+$/, "");
-	}
 
 	// Add Line break if a "." follows a capital letter without space
 	summary = summary.replaceAll(/\.(?=[A-Z][a-z ])/g, ".<br><br>");
