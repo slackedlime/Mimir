@@ -57,3 +57,8 @@ footer {
 	font-size: 50px;
 	font-weight: 100;
 }
+
+.logo:hover {
+	text-shadow: 0 0 5px var(--special-text);
+	transition: .5s ease;
+}

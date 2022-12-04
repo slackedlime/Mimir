@@ -1,10 +1,13 @@
 import * as wiki from "./wikipedia.js";
 
+const logo = document.getElementById("logo");
+
 const search = document.getElementById("search");
 const autoComplete = document.getElementById("auto-complete");
 
 const summaryTitle = document.getElementById("title");
 const summaryParagraph = document.getElementById("summary");
+
 const thumbnail = document.getElementById("thumbnail");
 const thumbnailExplaination = document.getElementById("thumbnail-explaination");
 
@@ -35,6 +38,10 @@ async function closeSearch() {
 	}
 }
 
+logo.addEventListener("click", () => {
+	window.open("https://booktimes.github.io/sol/");
+});
+
 search.addEventListener("input", () => {
 	if (!search.value) {
 		autoComplete.style.display = "none";
@@ -50,7 +57,7 @@ search.addEventListener("input", () => {
 			autoComplete.appendChild(document.createTextNode(
 				"Your Question Seems Specific, Why don't you try Asking it?"
 			));
-			
+
 			return;
 		}
 
