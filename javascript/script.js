@@ -39,7 +39,7 @@ async function closeSearch() {
 }
 
 logo.addEventListener("click", () => {
-	window.open("https://booktimes.github.io/sol/");
+	window.location.replace("https://booktimes.github.io/sol/");
 });
 
 search.addEventListener("input", () => {
@@ -108,6 +108,18 @@ document.onkeyup = (event) => {
 
 	if (event.code == "Slash") {
 		search.focus();
+	}
+}
+
+document.onmouseup = (event) => {
+	let selection = getSelection().toString().trim();
+
+	if (selection) {
+		wiki.getSearchItems(selection).then(items => {
+			if (items.length != 0 && event.button == 1) {
+				window.open(".?page=" + items[0]);
+			}
+		});
 	}
 }
 
